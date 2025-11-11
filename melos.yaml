@@ -1,0 +1,12 @@
+name: appkit
+packages:
+  - "apps/**"
+  - "packages/**"
+command:
+  bootstrap:
+    usePubspecOverrides: true
+scripts:
+  analyze: "melos exec -- flutter analyze"
+  test: "melos exec -- flutter test --no-pub"
+  format: "melos exec -- dart format ."
+  build_runner: "melos exec -- dart run build_runner build -d"

@@ -1,0 +1,13 @@
+name: core_db
+description: Drift (SQLite) setup
+version: 0.1.0
+publish_to: "none"
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+dependencies:
+  drift: ^2.20.0
+  sqlite3_flutter_libs: ^0.5.24
+  path: ^1.9.0
+dev_dependencies:
+  drift_dev: ^2.20.1
+  build_runner: ^2.4.10

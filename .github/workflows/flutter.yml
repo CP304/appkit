@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos analyze
+      - run: melos test
+      - run: melos exec --file-exists=pubspec.yaml --              bash -lc 'if [ -d apps/app ]; then cd apps/app && flutter build apk --debug; fi'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: apps/app/build/app/outputs/flutter-apk/app-debug.apk

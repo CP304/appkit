@@ -1,0 +1,17 @@
+name: feature_sample
+description: Beispiel-Feature (Riverpod + UI)
+version: 0.1.0
+publish_to: "none"
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.5.1
+  core_ui:
+    path: ../core_ui
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true
