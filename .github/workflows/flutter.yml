@@ -11,12 +11,35 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.24.0"
+
       - run: dart pub global activate melos
       - run: melos bootstrap
-      - run: melos analyze
-      - run: melos test
-      - run: melos exec --file-exists=pubspec.yaml --              bash -lc 'if [ -d apps/app ]; then cd apps/app && flutter build apk --debug; fi'
-      - uses: actions/upload-artifact@v4
+
+      # Analyze
+      - name: Analyze (Flutter)
+        run: melos exec --flutter -- flutter analyze
+      - name: Analyze (Dart)
+        run: melos exec --no-flutter -- dart analyze
+
+      # Tests
+      - name: Test (Flutter pkgs)
+        run: melos exec --flutter -- bash -lc 'if compgen -G "test/**.dart" > /dev/null; then flutter test; else echo "no flutter tests"; fi'
+      - name: Test (Dart pkgs)
+        run: melos exec --no-flutter -- bash -lc 'if compgen -G "test/**.dart" > /dev/null; then dart test; else echo "no dart tests"; fi'
+
+      # Build Android only if vorhanden
+      - name: Build Android debug (if android folder exists)
+        run: |
+          if [ -d apps/app/android ]; then
+            cd apps/app
+            flutter pub get
+            flutter build apk --debug
+          else
+            echo "Skipping Android build: apps/app/android not in repo"
+          fi
+
+      - if: ${{ hashFiles('apps/app/android/**') != '' }}
+        uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
           path: apps/app/build/app/outputs/flutter-apk/app-debug.apk
