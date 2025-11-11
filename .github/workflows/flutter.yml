@@ -6,28 +6,41 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MELOS_ROOT_PATH: ${{ github.workspace }}   # <- wichtig
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.35.7"
           channel: "stable"
 
+      - name: Verify workspace
+        run: |
+          pwd
+          ls -la
+          test -f melos.yaml && echo "melos.yaml found" || (echo "melos.yaml missing"; exit 1)
+
       - run: dart pub global activate melos
       - run: melos bootstrap
 
-      # Analyze
       - name: Analyze (Flutter)
         run: melos exec --flutter -- flutter analyze
       - name: Analyze (Dart)
         run: melos exec --no-flutter -- dart analyze
 
-      # Tests
       - name: Test (Flutter pkgs)
         run: melos exec --flutter -- bash -lc 'if compgen -G "test/**.dart" > /dev/null; then flutter test; else echo "no flutter tests"; fi'
       - name: Test (Dart pkgs)
         run: melos exec --no-flutter -- bash -lc 'if compgen -G "test/**.dart" > /dev/null; then dart test; else echo "no dart tests"; fi'
 
-      # Build Android only if vorhanden
       - name: Build Android debug (if android folder exists)
         run: |
           if [ -d apps/app/android ]; then
